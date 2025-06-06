@@ -9,3 +9,24 @@ License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.1
+Imports: 
+    arrow,
+    dplyr,
+    fable,
+    fable.prophet,
+    fabletools,
+    feasts,
+    generics,
+    here,
+    janitor,
+    measurements,
+    progressr,
+    purrr,
+    quarto,
+    readxl,
+    tibble,
+    tidyr,
+    tsibble
+Depends: 
+    R (>= 3.5)
+LazyData: true
