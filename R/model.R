@@ -44,79 +44,88 @@ models <- list(
   )
 )
 
-#' Train Model
+#' Split dataset into train and test sets
 #'
-#' @param train A `tsibble`.
-#' @param models A `list` of models to train.
-#' @returns A `mable`.
+#' @param tsb A `tsibble` with the time series data.
+#' @param test_size The proportion of data to use for testing.
+#' @returns A `list` with train and test sets.
 #' @export
-train_model <- function(train, models = models) {
-  message("Training model...")
-  mb <- progressr::with_progress(fabletools::model(train, !!!models), enable = TRUE)
-  message("Model trained.")
-  return(mb)
+split_dataset <- function(tsb, test_size) {
+  index <- tsibble::index_var(tsb)
+  keys <- tsibble::key_vars(tsb)
+  # Split data
+  message("\nSplitting data into train and test sets")
+  test <- tsb |>
+    tsibble::group_by_key() |>
+    dplyr::mutate(row_id = dplyr::row_number()) |>
+    dplyr::mutate(n_total = dplyr::n()) |>
+    dplyr::filter(.data$row_id > .data$n_total * (1 - test_size)) |>
+    dplyr::select(-.data$row_id, -.data$n_total) |>
+    dplyr::ungroup()
+
+  train <- dplyr::anti_join(tsb, test, by = c(index, keys))
+  return(list(train = train, test = test))
 }
 
-#' Forecast with ARIMA and STL+ETS
+#' Forecast and evaluate the models with RMSE
 #'
-#' This function forecast on two types of models:
-#'
-#' **ARIMA model** selected from:
-#' - \code{arima_def = fable::ARIMA(sqrt(units))}
-#' - \code{arima_lagged = fable::ARIMA(sqrt(units) ~ feature + display + tpr_only +
-#'  dplyr::lag(feature) + dplyr::lag(display) + dplyr::lag(tpr_only))}
-#
-#' Lagged ARIMA model is selected over the default ARIMA model (if available).
-#'
-#' **STL + ETS model**:
-#' After interpolating missing values using the selected ARIMA model,
-#' an STL decomposition followed by ETS modeling is performed.
-#'
-#' @param train A [`tsibble`][tsibble::tsibble] containing the training data.
-#'
-#' @return A [`mable`][fabletools::mable] containing the trained ARIMA and STL+ETS models.
-train_arima_stl <- function(train) {
-  message("\nTraining ARIMA...")
-  mbl_arima <- train_model(
-    train,
-    models = list(
-      arima_def = models$arima_def,
-      arima_lagged = models$arima_lagged
-    )
-  ) |>
-    mutate(arima = if_else(
-      is_null_model(arima_lagged), arima_def, arima_lagged
-    )) |>
-    select(-arima_def, -arima_lagged) |>
-    filter(!is_null_model(arima))
+#' @param fbl A `fable` with predictions.
+#' @param test A `tsibble` with test data.
+#' @param target A `character` indicating the target variable.
+#' @returns A `tibble` with RMSE for each model.
+#' @export
+calculate_rmse <- function(fbl, test, target) {
+  index <- tsibble::index_var(test)
+  keys <- tsibble::key_vars(test)
+  return(
+    fbl |>
+      tibble::as_tibble() |>
+      dplyr::left_join(
+        test,
+        by = c(index, keys),
+        suffix = rep("", length(keys))
+      ) |>
+      dplyr::group_by(dplyr::across(tidyselect::all_of(c(keys, "model")))) |>
+      dplyr::summarise(
+        RMSE = sqrt(mean(
+          (.data[[target]] - .data$.mean)^2,
+          na.rm = TRUE
+        )),
+        .groups = "drop"
+      )
+  )
+}
 
-  message("\nInterpolating and training STL+ETS model ...")
-  mbl_stl <- mbl_arima |>
-    generics::interpolate(
-      semi_join(train, mbl_arima, by = c("store_id", "upc_id"))
-    ) |>
-    train_model(models = models$stl)
-  return(dplyr::bind_cols((mbl_arima), mbl_stl["stl"]))
+
+#' Train Models
+#'
+#' @param train A `tsibble` with training data.
+#' @param mods A named `list` of models to train.
+#' @returns A `mable`.
+#' @export
+train_model <- function(train, mods) {
+  mb <- progressr::with_progress(fabletools::model(train, !!!mods), enable = TRUE)
+  return(mb)
 }
 
 #' Forecasting function
 #'
-#' @param fit A `mable` with fitted models.
+#' @param mbl A `mable` with fitted models.
 #' @param test A `tsibble` with test data.
 #' @param bs An `integer` with batch size.
 #' @returns A `fable` with forecasts for the test data.
 #' @export
-get_forecast <- function(fit, test, bs) {
-  batchs <- seq(1, nrow(fit), by = bs)
+get_forecast <- function(mbl, test, bs) {
+  batchs <- seq(1, nrow(mbl), by = bs)
   progressr::with_progress(
     {
       p <- progressr::progressor(along = batchs)
       purrr::map_dfr(
         batchs,
         function(x) {
-          end <- min(x + bs - 1, nrow(fit))
-          # p(sprintf("%s/%s", end, nrow(fit)))
-          fabletools::forecast(fit[x:end, ], test)
+          end <- min(x + bs - 1, nrow(mbl))
+          # p(sprintf("%s/%s", end, nrow(mbl)))
+          fabletools::forecast(mbl[x:end, ], test)
         }
       )
     },
@@ -126,13 +135,14 @@ get_forecast <- function(fit, test, bs) {
 
 #' Helper function to calculate lower and upper bounds
 #'
-#' @param fc A `fable` object with forecasts.
+#' @param fbl A `fable` object with forecasts.
+#' @param target A `character` indicating the target variable.
 #' @param level A `numeric` with the confidence level.
 #' @param pos A `character` with the position of the bound (lower or upper).
-#' @returns A `numeric` with the bound or NA if there::here is an error.
-hilo_bound <- function(fc, level, pos) {
+#' @returns A `numeric` with the bound or NA if there is an error.
+hilo_bound <- function(fbl, target, level, pos) {
   purrr::map_dbl(
-    fc$units,
+    fbl[[target]],
     ~ tryCatch(
       {
         if (pos == "upper") {
@@ -150,66 +160,18 @@ hilo_bound <- function(fc, level, pos) {
 
 #' Helper function to add CI to fables
 #'
-#' @param fc A `fable` object with forecasts.
+#' Adds 80% and 95% CI bounds to a fable object.
+#'
+#' @param fbl A `fable` object with forecasts.
+#' @param target A `character` indicating the target variable.
 #' @returns A `tsibble` with lower and upper bounds.
 #' @export
-add_ci <- function(fc) {
+add_ci <- function(fbl, target) {
   # Add lower and upper bounds
-  fc$low80 <- fc |> hilo_bound(80, "lower")
-  fc$up80 <- fc |> hilo_bound(80, "upper")
-  fc$low95 <- fc |> hilo_bound(95, "lower")
-  fc$up95 <- fc |> hilo_bound(95, "upper")
+  fbl$low80 <- fbl |> hilo_bound(target, 80, "lower")
+  fbl$up80 <- fbl |> hilo_bound(target, 80, "upper")
+  fbl$low95 <- fbl |> hilo_bound(target, 95, "lower")
+  fbl$up95 <- fbl |> hilo_bound(target, 95, "upper")
 
-  return(
-    fc |>
-      tsibble::as_tsibble() |>
-      dplyr::select(-units) |>
-      dplyr::rename(p_units = ".mean")
-  )
-}
-
-#' Forecasting function for ARIMA
-#'
-#' @description
-#' Forecast for Dinamyc Regression Model with ARIMA errors.
-#' Because this model needs regressors, we will forecast in all possible combination of
-#' regressors (feature, display, tpr_only).
-#' @param fit A `mable` with fitted models.
-#' @param data A `tsibble` with time series data.
-#' @param bs An `integer` with batch size.
-#' @returns A `fable` with forecasts for the test data.
-#' @export
-forecast_arima <- function(fit, data, bs) {
-  combinations <- list(
-    list(feature = 0, display = 0, tpr_only = 0),
-    list(feature = 1, display = 0, tpr_only = 0),
-    list(feature = 0, display = 1, tpr_only = 0),
-    list(feature = 0, display = 0, tpr_only = 1),
-    list(feature = 1, display = 1, tpr_only = 0)
-  )
-
-  fc_arima <- purrr::map_dfr(
-    seq_along(combinations), function(i) {
-      message(
-        "\n\nFeature = ", combinations[[i]]$feature,
-        "| Display = ", combinations[[i]]$display,
-        "| TPR = ", combinations[[i]]$tpr_only,
-        "\n"
-      )
-      ds <- tsibble::new_data(data, n = 2) |>
-        dplyr::mutate(!!!combinations[[i]])
-      fc <- get_forecast(dplyr::select(fit, -stl), ds, bs) |>
-        dplyr::mutate(fc_ind = i)
-      # Save checkpoint just in case
-      # saveRDS(fc, glue::glue("output/model/fc_arima_{i}.rds"))
-
-      # Return as tibble to avoid problems binding later
-      return(tibble::as_tibble(fc))
-    }
-  )
-  return(
-    fc_arima |>
-      tsibble::as_tsibble(index = week, key = c(store_id, upc_id, .model, fc_ind)) |>
-      add_ci()
-  )
+  return(tsibble::as_tsibble(fbl))
 }
