@@ -1,0 +1,9 @@
+global.R
+ui.R
+server.R
+data/transaction.parquet
+data/store.parquet
+data/product.parquet
+forecast/fbl_arima.parquet
+forecast/fbl_stl.parquet
+forecast/residuals.parquet
