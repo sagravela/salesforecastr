@@ -1,1 +1,8 @@
+^renv$
+^renv\.lock$
 ^data-raw$
+^old-data$
+^assests$
+^app$
+^main.R$
+^LICENSE\.md$
