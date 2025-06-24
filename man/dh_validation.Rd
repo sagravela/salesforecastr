@@ -2,7 +2,7 @@
 % Please edit documentation in R/pipeline.R
 \name{dh_validation}
 \alias{dh_validation}
-\title{Validation}
+\title{Validation Pipeline}
 \usage{
 dh_validation(
   raw_data_path = NULL,
@@ -21,5 +21,38 @@ dh_validation(
 \item{batch_size}{The size of the batch for forecasting. Defaults to 8.}
 }
 \description{
-Validation
+This function performs the following steps:
+\itemize{
+\item Generates a data analysis report in Quarto.
+\item Samples time series for validation:
+\itemize{
+\item One time series sample randomly for each product category and store.
+\item Less than 25\% missing values.
+}
+\item Null imputation with \code{fable::ARIMA(sqrt(units))} and regressors set to 0.
+\item Splits the dataset into training and testing sets based on \code{test_size}.
+\item Trains the following models:
+\itemize{
+\item \code{arima_def}: ARIMA model on \code{sqrt(units)} with default settings.
+\item \code{arima_base}: ARIMA model on \code{sqrt(units)} with predictors.
+\item \code{arima_lagged}: ARIMA model on \code{sqrt(units)} with predictors and their lagged values.
+\item \code{arima_seasonal}: ARIMA model with seasonal terms using Fourier series (\code{K = 6}) and predictors.
+\item \code{arima_seasonal_lagged}: ARIMA model with seasonal terms, predictors, and their lagged values.
+\item \code{stl}: Seasonal decomposition model using STL and ETS on seasonally adjusted data.
+\item \code{nnetar}: Neural network autoregression model with predictors.
+\item \code{prophet}: Prophet model with predictors.
+}
+\item Selects the best ARIMA model based on AICc.
+\item Calculates RMSE for the selected ARIMA model and STL+ETS model.
+\item Renders a validation report.
+}
+
+All models forecast the square root of the \code{units} variable to help stabilize variance.
+Predictor variables are \code{feature}, \code{display}, and \code{tpr_only}.
+}
+\details{
+Needs write permissions in the installed package location to render Quarto reports.
+}
+\seealso{
+\code{\link[fable:ARIMA]{fable::ARIMA}} \code{\link[fable:NNETAR]{fable::NNETAR}} \code{\link[fable.prophet:prophet]{fable.prophet::prophet}} \code{\link[feasts:STL]{feasts::STL}} \code{\link[fable:ETS]{fable::ETS}}
 }

@@ -60,9 +60,8 @@ data_loading <- function(raw_data_path, data_path) {
   write_to_parquet(data$product, file.path(data_path, "product.parquet"))
   write_to_parquet(data$transaction, file.path(data_path, "transaction.parquet"))
 
-  return(data)
+  data
 }
-
 
 #' Render Quarto Report
 #'
@@ -225,7 +224,7 @@ dh_forecasting <- function(
       # saveRDS(fbl, glue::glue("output/model/fbl_arima_{i}.rds"))
 
       # Return as tibble to avoid problems binding later
-      return(tibble::as_tibble(fbl))
+      tibble::as_tibble(fbl)
     }
   )
 
@@ -245,12 +244,41 @@ dh_forecasting <- function(
     write_to_parquet(fbl_arima_path)
 }
 
-#' Validation
+#' Validation Pipeline
+#'
+#' @description
+#' This function performs the following steps:
+#' * Generates a data analysis report in Quarto.
+#' * Samples time series for validation:
+#'     * One time series sample randomly for each product category and store.
+#'     * Less than 25% missing values.
+#' * Null imputation with `fable::ARIMA(sqrt(units))` and regressors set to 0.
+#' * Splits the dataset into training and testing sets based on `test_size`.
+#' * Trains the following models:
+#'     * `arima_def`: ARIMA model on `sqrt(units)` with default settings.
+#'     * `arima_base`: ARIMA model on `sqrt(units)` with predictors.
+#'     * `arima_lagged`: ARIMA model on `sqrt(units)` with predictors and their lagged values.
+#'     * `arima_seasonal`: ARIMA model with seasonal terms using Fourier series (`K = 6`) and predictors.
+#'     * `arima_seasonal_lagged`: ARIMA model with seasonal terms, predictors, and their lagged values.
+#'     * `stl`: Seasonal decomposition model using STL and ETS on seasonally adjusted data.
+#'     * `nnetar`: Neural network autoregression model with predictors.
+#'     * `prophet`: Prophet model with predictors.
+#' * Selects the best ARIMA model based on AICc.
+#' * Calculates RMSE for the selected ARIMA model and STL+ETS model.
+#' * Renders a validation report.
+#'
+#' All models forecast the square root of the `units` variable to help stabilize variance.
+#' Predictor variables are `feature`, `display`, and `tpr_only`.
+#'
+#' @details
+#' Needs write permissions in the installed package location to render Quarto reports.
 #'
 #' @param raw_data_path Optional path to the raw data file location.
 #' @param output_dir Directory where the output files will be saved. Defaults to the current working directory.
 #' @param test_size Proportion of the dataset to be used for testing.
 #' @param batch_size The size of the batch for forecasting. Defaults to 8.
+#' @seealso [`fable::ARIMA`] [`fable::NNETAR`] [`fable.prophet::prophet`] [`feasts::STL`] [`fable::ETS`]
+#'
 #' @export
 dh_validation <- function(
     raw_data_path = NULL,
@@ -274,7 +302,7 @@ dh_validation <- function(
   # Data Analysis report
   render_quarto_report(
     report = "data_analysis",
-    data_path = data_path,
+    data_path = normalizePath(data_path),
     output_path = reports_path
   )
 
@@ -307,16 +335,16 @@ dh_validation <- function(
   aicc <- mbl |>
     dplyr::select(tidyselect::all_of(keys), tidyselect::matches("arima")) |>
     generics::glance() |>
-    dplyr::select(tidyselect::all_of(keys), .data$.model, .data$AICc) |>
-    tidyr::pivot_wider(names_from = .data$.model, values_from = .data$AICc)
+    dplyr::select(tidyselect::all_of(keys), ".model", "AICc") |>
+    tidyr::pivot_wider(names_from = ".model", values_from = "AICc")
 
   # Calculate RMSE for selected ARIMA model and STL+ETS model
   rmse <- dplyr::select(mbl, .data$arima_lagged, .data$stl) |>
     get_forecast(test, batch_size) |>
     calculate_rmse(test, "units") |>
     tidyr::pivot_wider(
-      names_from = .data$.model,
-      values_from = .data$RMSE
+      names_from = ".model",
+      values_from = "RMSE"
     )
 
   results <- dplyr::bind_rows(aicc = aicc, rmse = rmse, .id = "metric")
@@ -326,7 +354,7 @@ dh_validation <- function(
   # Render validation report
   render_quarto_report(
     report = "validation",
-    data_path = validation_path,
+    data_path = normalizePath(validation_path),
     output_path = reports_path
   )
 

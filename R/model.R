@@ -77,23 +77,21 @@ split_dataset <- function(tsb, test_size) {
 calculate_rmse <- function(fbl, test, target) {
   index <- tsibble::index_var(test)
   keys <- tsibble::key_vars(test)
-  return(
-    fbl |>
-      tibble::as_tibble() |>
-      dplyr::left_join(
-        test,
-        by = c(index, keys),
-        suffix = rep("", length(keys))
-      ) |>
-      dplyr::group_by(dplyr::across(tidyselect::all_of(c(keys, "model")))) |>
-      dplyr::summarise(
-        RMSE = sqrt(mean(
-          (.data[[target]] - .data$.mean)^2,
-          na.rm = TRUE
-        )),
-        .groups = "drop"
-      )
-  )
+  fbl |>
+    tibble::as_tibble() |>
+    dplyr::left_join(
+      test,
+      by = c(index, keys),
+      suffix = rep("", length(keys))
+    ) |>
+    dplyr::group_by(dplyr::across(tidyselect::all_of(c(keys, ".model")))) |>
+    dplyr::summarise(
+      RMSE = sqrt(mean(
+        (.data[[target]] - .data$.mean)^2,
+        na.rm = TRUE
+      )),
+      .groups = "drop"
+    )
 }
 
 

@@ -77,7 +77,7 @@ server <- function(input, output, session) {
         data = f_rfbl_arima
       ) +
       # STL forecast plot
-      geom_line(aes(week, units, color = forcats::as_factor(model)), data = rfbl_stl()) +
+      geom_line(aes(week, units, color = model), data = rfbl_stl()) +
       # CI 95% and 80%
       geom_ribbon(
         aes(week, ymin = low95, ymax = up95, fill = model),
