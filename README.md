@@ -1,28 +1,18 @@
 # Sales Time Series Analysis and Forecasting with R
 
-Forecasted over 3,500 time series for various products across multiple stores, applying advanced forecasting models such as *ARIMA* and *STL+ETS*. Model's prediction error translates in average to ~$15 per week in potential revenue miscalculation. Forecasted data was integrated into an interactive dashboard, enabling real-time visualization and data-driven decision-making for enhanced inventory and sales strategy.
+Forecasted over 3,500 time series for various products across multiple stores, applying advanced forecasting models such as *ARIMA*, *STL+ETS*, *NNETAR* and *Prophet*. Model's prediction error translates in average to ~$15 per week in potential revenue miscalculation. Forecasted data was integrated into an interactive dashboard, enabling real-time visualization and data-driven decision-making for enhanced inventory and sales strategy.
  ![Sales Time Series Dashboard](assets/sales_forecast.gif)
 
-## Overview
-- **Data Preparation**: Includes cleaning, transforming, and structuring the raw sales dataset.
-- **Exploratory Data Analysis (EDA)**: Provides insights into the data, addressing promotional effects, outliers and features summary.
-- **Model Validation**: Uses a sub-dataset to validate and select within the following models:
-    - **ARIMA** and their variations: default, with lagged predictors, with seasonal predictors and both.
-    - Seasonal descomposition with exponential smoothing applied to errors (**STL + ETS**).
-    - Default neural network (**NNETAR**) with regressors.
-    - Default **Prophet** model with regressors.
-
-- **Model Fitting and Forecasting**: Applies the chosen models to the entire dataset to generate forecasts.
-- **Results Storage**: Saves all predictions in a comprehensive and lightweight Parquet format for easy access and analysis.
-
-## Shiny App Features
-- **Interactive Interface**: Allows end users to search for specific stores and products.
-- **Predictions Display**: Provides well-curated sales predictions for the selected store and product.
-- **Residual Analysis**: Offers insights into the model performance through residual analysis.
-- **Feature Correlation**: Displays correlations between features and sales, aiding in understanding the factors influencing sales.
-
 ## Getting Started
-Shiny App can be run without any setup, click on [shinyapp.io](https://sagravela.shinyapps.io/sales-forecast-dashboard/). To run this locally, all the requirements are in `environment.yml` file.
+Shiny App Demo can be run without any setup, click on [shinyapp.io](https://sagravela.shinyapps.io/sales-forecast-dashboard/).  
+The entire pipeline is available as an R package, `salesforecastr`, which can be used to run the forecasting and validation process easily.
+To run it locally, build with:
+```{r}
+devtools::install_github("sagravela/salesforecastr")
+```
+Then the pipeline can be run with `dh_forecasting()` and `dh_validation()` functions.  
+>For more details, check the documentation package (`?salesforecastr`).
+
 
 ## Dataset Overview: Breakfast at the Frat, a Time Series Analysis
 Breakfast at the Frat contains a representation of sales and 

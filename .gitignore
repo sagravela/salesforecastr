@@ -5,3 +5,5 @@
 .DS_Store
 .quarto
 *.xlsx
+app/**/*.parquet
+app/**/*.rds

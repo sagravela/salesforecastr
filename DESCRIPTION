@@ -7,7 +7,7 @@ Description: What the package does (one paragraph).
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2
 Imports: 
     arrow,
     dplyr,
@@ -16,17 +16,21 @@ Imports:
     fabletools,
     feasts,
     generics,
+    ggplot2,
     glue,
     janitor,
     measurements,
+    plotly,
     progressr,
     purrr,
     quarto,
     readxl,
+    skimr,
     tibble,
     tidyr,
     tidyselect,
-    tsibble
+    tsibble,
+    urca
 Depends: 
     R (>= 3.5)
 LazyData: true
