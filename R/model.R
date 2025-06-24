@@ -64,7 +64,7 @@ split_dataset <- function(tsb, test_size) {
     dplyr::ungroup()
 
   train <- dplyr::anti_join(tsb, test, by = c(index, keys))
-  return(list(train = train, test = test))
+  list(train = train, test = test)
 }
 
 #' Forecast and evaluate the models with RMSE
@@ -102,8 +102,7 @@ calculate_rmse <- function(fbl, test, target) {
 #' @returns A `mable`.
 #' @export
 train_model <- function(train, mods) {
-  mb <- progressr::with_progress(fabletools::model(train, !!!mods), enable = TRUE)
-  return(mb)
+  progressr::with_progress(fabletools::model(train, !!!mods), enable = TRUE)
 }
 
 #' Forecasting function
@@ -171,5 +170,5 @@ add_ci <- function(fbl, target) {
   fbl$low95 <- fbl |> hilo_bound(target, 95, "lower")
   fbl$up95 <- fbl |> hilo_bound(target, 95, "upper")
 
-  return(tsibble::as_tsibble(fbl))
+  tsibble::as_tsibble(fbl)
 }
