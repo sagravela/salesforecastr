@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{to_tsibble}
 \alias{to_tsibble}
-\title{Parse tibble to tsibble}
+\title{Parse tibble to tsibble with defined index and keys}
 \usage{
 to_tsibble(tbl)
 }
@@ -13,5 +13,5 @@ to_tsibble(tbl)
 A \code{tsibble}
 }
 \description{
-Parse tibble to tsibble
+Parse tibble to tsibble with defined index and keys
 }

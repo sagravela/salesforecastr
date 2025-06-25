@@ -49,7 +49,7 @@ converter <- function(x) {
   return(result)
 }
 
-#' Parse tibble to tsibble
+#' Parse tibble to tsibble with defined index and keys
 #'
 #' @param tbl A `tibble`
 #' @returns A `tsibble`
@@ -65,8 +65,13 @@ to_tsibble <- function(tbl) {
 
 #' Process data
 #'
-#' @param data A `list` of dataframes.
-#' @returns Cleaned data.
+#' Prepare data to comsumption. Steps for each dataset:
+#' * Store -> Unify repeated store with distinct `seg_value_name`.
+#' * Product -> Convert product size to volume (ml) and mass (oz).
+#' * Transaction -> Parse to `tsibble` format.
+#'
+#' @param data A `list` of dataframes for store, product and transaction.
+#' @returns A `list` of processed dataframes.
 #' @export
 process_data <- function(data) {
   message("\nProcessing data...")
@@ -183,7 +188,7 @@ sample_ts <- function(transaction, product) {
 #' Imputation
 #'
 #' Nulls imputation with ARIMA because some models require non-nulls.
-#' Also, I impute feature, display and tpr_only with 0.
+#' Imputation of feature, display and tpr_only with 0.
 #'
 #' @param sampled_transaction A `tsibble` with sampled time series.
 #' @returns A `tsibble` with the imputed time series.

@@ -15,6 +15,6 @@ data_loading(raw_data_path, data_path)
 A list containing the processed data frames: store, product, and transaction.
 }
 \description{
-If path is provided, apply the processing steps. Otherwise, use the default datasets.
+If raw data path is provided, apply the processing steps. Otherwise, use the default datasets.
 Save them to the output directory.
 }

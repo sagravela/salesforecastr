@@ -135,7 +135,7 @@ get_forecast <- function(mbl, test, bs) {
 #' @param fbl A `fable` object with forecasts.
 #' @param target A `character` indicating the target variable.
 #' @param level A `numeric` with the confidence level.
-#' @param pos A `character` with the position of the bound (lower or upper).
+#' @param pos A `character` with the position of the bound (`lower` or `upper`).
 #' @returns A `numeric` with the bound or NA if there is an error.
 hilo_bound <- function(fbl, target, level, pos) {
   purrr::map_dbl(

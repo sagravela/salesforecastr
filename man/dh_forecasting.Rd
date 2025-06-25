@@ -21,16 +21,19 @@ dh_forecasting(
 \item{batch_size}{The size of the batch for forecasting. Defaults to 8.}
 }
 \description{
-Models \strong{ARIMA}:
+Models:
+\itemize{
+\item \strong{ARIMA}:
 \itemize{
 \item \code{arima_def = fable::ARIMA(sqrt(units))}
-\item \code{arima_lagged = fable::ARIMA(sqrt(units) ~ feature + display + tpr_only +
- dplyr::lag(feature) + dplyr::lag(display) + dplyr::lag(tpr_only))}
-Lagged ARIMA model is preferred over the default ARIMA model (if it isn't null).
+\item \code{arima_lagged = fable::ARIMA(sqrt(units) ~ feature + display + tpr_only + dplyr::lag(feature) + dplyr::lag(display) + dplyr::lag(tpr_only))}
+(Lagged ARIMA model is preferred over the default ARIMA model (if it isn't null))
 }
-}
-\details{
-\strong{STL + ETS model}:
+\item \strong{STL + ETS model}:
 After interpolating missing values using the selected ARIMA model,
 an STL decomposition followed by ETS modeling is performed.
+}
+}
+\seealso{
+\code{\link[fable:ARIMA]{fable::ARIMA}} \code{\link[feasts:STL]{feasts::STL}} \code{\link[fable:ETS]{fable::ETS}}
 }

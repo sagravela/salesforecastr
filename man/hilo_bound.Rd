@@ -13,7 +13,7 @@ hilo_bound(fbl, target, level, pos)
 
 \item{level}{A \code{numeric} with the confidence level.}
 
-\item{pos}{A \code{character} with the position of the bound (lower or upper).}
+\item{pos}{A \code{character} with the position of the bound (\code{lower} or \code{upper}).}
 }
 \value{
 A \code{numeric} with the bound or NA if there is an error.

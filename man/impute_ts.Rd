@@ -14,5 +14,5 @@ A \code{tsibble} with the imputed time series.
 }
 \description{
 Nulls imputation with ARIMA because some models require non-nulls.
-Also, I impute feature, display and tpr_only with 0.
+Imputation of feature, display and tpr_only with 0.
 }

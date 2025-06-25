@@ -6,16 +6,16 @@
 \title{Store Information Dataset}
 \format{
 A tibble with 77 stores and 9 variables:
-\describe{
-\item{store_id}{Character. Unique identifier for each store.}
-\item{store_name}{Character. Name of the store.}
-\item{address_city_name}{Character. City where the store is located.}
-\item{address_state_prov_code}{Character. Two-letter state or province code.}
-\item{msa_code}{Numeric. Metropolitan statistical area code.}
-\item{seg_value_name}{Character. Customer segmentation category (e.g., "MAINSTREAM", "UPSCALE", "VALUE").}
-\item{parking_space_qty}{Numeric. Number of parking spaces (may contain NAs).}
-\item{sales_area_size_num}{Numeric. Size of the sales floor area in square feet.}
-\item{avg_weekly_baskets}{Numeric. Average number of baskets (transactions) per week.}
+\itemize{
+\item \code{store_id} Character. Unique identifier for each store.
+\item \code{store_name} Character. Name of the store.
+\item \code{address_city_name} Character. City where the store is located.
+\item \code{address_state_prov_code} Character. Two-letter state or province code.
+\item \code{msa_code} Numeric. Metropolitan statistical area code.
+\item \code{seg_value_name} Character. Customer segmentation category (e.g., "MAINSTREAM", "UPSCALE", "VALUE").
+\item \code{parking_space_qty} Numeric. Number of parking spaces (may contain NAs).
+\item \code{sales_area_size_num} Numeric. Size of the sales floor area in square feet.
+\item \code{avg_weekly_baskets} Numeric. Average number of baskets (transactions) per week.
 }
 }
 \source{

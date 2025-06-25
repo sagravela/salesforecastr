@@ -7,11 +7,16 @@
 process_data(data)
 }
 \arguments{
-\item{data}{A \code{list} of dataframes.}
+\item{data}{A \code{list} of dataframes for store, product and transaction.}
 }
 \value{
-Cleaned data.
+A \code{list} of processed dataframes.
 }
 \description{
-Process data
+Prepare data to comsumption. Steps for each dataset:
+\itemize{
+\item Store -> Unify repeated store with distinct \code{seg_value_name}.
+\item Product -> Convert product size to volume (ml) and mass (oz).
+\item Transaction -> Parse to \code{tsibble} format.
+}
 }

@@ -4,12 +4,12 @@
 \name{salesforecastr-package}
 \alias{salesforecastr}
 \alias{salesforecastr-package}
-\title{salesforecastr: What the Package Does (One Line, Title Case)}
+\title{salesforecastr: Sales Forecasting with Time Series Models}
 \description{
-What the package does (one paragraph).
+A package for sales forecasting using time series models. It provides tools for data preparation, model fitting, and evaluation, with a focus on ease of use and flexibility.
 }
 \author{
-\strong{Maintainer}: First Last \email{first.last@example.com}
+\strong{Maintainer}: Alejandro Vargas \email{alejandrovargasauger@gmail.com}
 
 }
 \keyword{internal}

@@ -6,15 +6,15 @@
 \title{Product Information Dataset}
 \format{
 A tibble with 58 produtcts and 8 variables:
-\describe{
-\item{upc_id}{Character. Universal Product Code (UPC) identifier.}
-\item{description}{Character. Product description.}
-\item{manufacturer}{Character. Name of the product manufacturer.}
-\item{category}{Character. Product category (e.g., "BAG SNACKS", "ORAL HYGIENE PRODUCTS").}
-\item{sub_category}{Character. More specific product classification.}
-\item{product_size}{Character. Product size as indicated on the packaging (e.g., "15 OZ", "1.5 LT").}
-\item{volume_ml}{Numeric. Product volume in milliliters (may be NA if not applicable).}
-\item{mass_oz}{Numeric. Product mass in ounces (may be NA if not applicable).}
+\itemize{
+\item \code{upc_id} Character. Universal Product Code (UPC) identifier.
+\item \code{description} Character. Product description.
+\item \code{manufacturer} Character. Name of the product manufacturer.
+\item \code{category} Character. Product category (e.g., "BAG SNACKS", "ORAL HYGIENE PRODUCTS").
+\item \code{sub_category} Character. More specific product classification.
+\item \code{product_size} Character. Product size as indicated on the packaging (e.g., "15 OZ", "1.5 LT").
+\item \code{volume_ml} Numeric. Product volume in milliliters (may be NA if not applicable).
+\item \code{mass_oz} Numeric. Product mass in ounces (may be NA if not applicable).
 }
 }
 \source{

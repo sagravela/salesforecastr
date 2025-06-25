@@ -24,7 +24,7 @@ write_to_parquet <- function(data, path) {
 
 #' Data Loading and Preparation
 #'
-#' If path is provided, apply the processing steps. Otherwise, use the default datasets.
+#' If raw data path is provided, apply the processing steps. Otherwise, use the default datasets.
 #' Save them to the output directory.
 #'
 #' @param raw_data_path Optional path to the raw data file location.
@@ -100,14 +100,15 @@ render_quarto_report <- function(report, data_path, output_path) {
 
 #' Forecasting
 #'
-#' Models **ARIMA**:
-#' - \code{arima_def = fable::ARIMA(sqrt(units))}
-#' - \code{arima_lagged = fable::ARIMA(sqrt(units) ~ feature + display + tpr_only +
-#'  dplyr::lag(feature) + dplyr::lag(display) + dplyr::lag(tpr_only))}
-#
-#' Lagged ARIMA model is preferred over the default ARIMA model (if it isn't null).
+#' @description
+#' Models:
+#' * **ARIMA**:
+#'   * `arima_def = fable::ARIMA(sqrt(units))`
+#'   * `arima_lagged = fable::ARIMA(sqrt(units) ~ feature + display + tpr_only +
+#'      dplyr::lag(feature) + dplyr::lag(display) + dplyr::lag(tpr_only))`
+#'  (Lagged ARIMA model is preferred over the default ARIMA model (if it isn't null))
 #'
-#' **STL + ETS model**:
+#' * **STL + ETS model**:
 #' After interpolating missing values using the selected ARIMA model,
 #' an STL decomposition followed by ETS modeling is performed.
 #'
@@ -115,6 +116,7 @@ render_quarto_report <- function(report, data_path, output_path) {
 #' @param raw_data_path Optional path to the raw data file location.
 #' @param output_dir Directory where the output files will be saved. Defaults to the current working directory.
 #' @param batch_size The size of the batch for forecasting. Defaults to 8.
+#' @seealso [`fable::ARIMA`] [`feasts::STL`] [`fable::ETS`]
 #' @export
 dh_forecasting <- function(
     steps = 2,
@@ -140,9 +142,6 @@ dh_forecasting <- function(
   # Data processing
   message("\nData Processing")
   tsb <- filter_ts(data$transaction) |> tsibble::fill_gaps()
-
-  # Sample for debugging
-  tsb <- sample_for_debugging(tsb)
 
   # Training
   message("\nTraining")
@@ -314,9 +313,6 @@ dh_validation <- function(
   index <- tsibble::index_var(tsb)
   keys <- tsibble::key_vars(tsb)
 
-  # Sample for debugging
-  tsb <- sample_for_debugging(tsb)
-
   # Split data
   splitted_data <- split_dataset(tsb, test_size)
   train <- splitted_data$train
@@ -339,6 +335,7 @@ dh_validation <- function(
     tidyr::pivot_wider(names_from = ".model", values_from = "AICc")
 
   # Calculate RMSE for selected ARIMA model and STL+ETS model
+  message("\nEvaluating RMSE in test set on selected ARIMA and STL+ETS model")
   rmse <- dplyr::select(mbl, .data$arima_lagged, .data$stl) |>
     get_forecast(test, batch_size) |>
     calculate_rmse(test, "units") |>
