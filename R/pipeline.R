@@ -12,92 +12,6 @@ sample_for_debugging <- function(ts, n = 10) {
   )
 }
 
-#' Decorate function to add a message after saving data
-#'
-#' @param data Data frame to be written to parquet.
-#' @param path Path
-write_to_parquet <- function(data, path) {
-  # Write data to parquet file
-  arrow::write_parquet(data, path)
-  message("Data saved to: ", path)
-}
-
-#' Data Loading and Preparation
-#'
-#' If raw data path is provided, apply the processing steps. Otherwise, use the default datasets.
-#' Save them to the output directory.
-#'
-#' @param raw_data_path Optional path to the raw data file location.
-#' @param data_path Directory where the output files will be saved.
-#' @return A list containing the processed data frames: store, product, and transaction.
-#' @export
-data_loading <- function(raw_data_path, data_path) {
-  if (!is.null(raw_data_path)) {
-    # Check if input_path exists
-    if (!file.exists(raw_data_path)) {
-      stop("The specified input_path does not exist: ", raw_data_path)
-    }
-    message("\nLoading data from ", raw_data_path)
-    data <- load_raw_data(raw_data_path) |> process_data()
-  } else {
-    message("\nNo raw data path provided. Using default datasets.")
-
-    # Load from internal data without polluting global env
-    data_env <- new.env()
-    utils::data("store", package = "salesforecastr", envir = data_env)
-    utils::data("product", package = "salesforecastr", envir = data_env)
-    utils::data("transaction", package = "salesforecastr", envir = data_env)
-
-    data <- list(
-      store = data_env$store,
-      product = data_env$product,
-      transaction = data_env$transaction
-    )
-  }
-
-  message("\nData loaded successfully.")
-  write_to_parquet(data$store, file.path(data_path, "store.parquet"))
-  write_to_parquet(data$product, file.path(data_path, "product.parquet"))
-  write_to_parquet(data$transaction, file.path(data_path, "transaction.parquet"))
-
-  data
-}
-
-#' Render Quarto Report
-#'
-#' Render the Quarto report and save the output to the output directory.
-#'
-#' @param report Name of the report to render (without .qmd extension).
-#' @param data_path Path to the data directory.
-#' @param output_path Path to the output directory where the report will be saved.
-render_quarto_report <- function(report, data_path, output_path) {
-  # Data analysis report
-  quarto::quarto_render(
-    system.file("reports", glue::glue("{report}.qmd"), package = "salesforecastr"),
-    output_format = "all",
-    execute_params = list(
-      path = data_path
-    )
-  )
-  # Now move the output to the output path and remove the original output
-  files <- list.files(
-    system.file("reports", package = "salesforecastr"),
-    full.names = TRUE, recursive = TRUE, pattern = report
-  )
-  dirs <- list.dirs(
-    system.file("reports", package = "salesforecastr"),
-    full.names = TRUE, recursive = FALSE
-  )
-  # Copy the entire reports directory to the specified reports_path
-  file.copy(from = files, to = output_path, recursive = TRUE, overwrite = TRUE)
-  file.copy(from = dirs, to = output_path, recursive = TRUE, overwrite = TRUE)
-
-  # Remove all files and folders in reports except *.qmd files
-  unlink(c(dirs, files[!grepl(".qmd", files)]), recursive = TRUE, force = TRUE)
-
-  message("Report rendered and saved to: ", output_path)
-}
-
 #' Forecasting
 #'
 #' @description
@@ -317,6 +231,8 @@ dh_validation <- function(
   splitted_data <- split_dataset(tsb, test_size)
   train <- splitted_data$train
   test <- splitted_data$test
+
+  train <- sample_for_debugging(train)
 
   # Validation
   message("\n\nStarting validation")
