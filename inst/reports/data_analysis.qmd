@@ -48,23 +48,27 @@ describe <- skimr::skim_with(
 )
 ```
 
+{{< pagebreak >}}
 
 ## Transactions
 ```{r}
 describe(tibble::as_tibble(transaction) |> dplyr::select(-week))
 ```
-
+{{< pagebreak >}}
 
 ## Stores
 ```{r}
 describe(store)
 ```
 
+{{< pagebreak >}}
 
 ## Products
 ```{r}
 describe(product)
 ```
+
+{{< pagebreak >}}
 
 # Outliers
 
@@ -109,9 +113,14 @@ outliers <- function(transaction) {
 outliers(transaction)
 ```
 
+{{< pagebreak >}}
+
 # What is the range of prices offered on product?
 
 ```{r}
+#| echo: !expr knitr::is_html_output()
+#| code-fold: true
+
 #' Price range
 #'
 #' Print the range of prices offered on product.
@@ -140,9 +149,14 @@ prices_range <- function(transaction) {
 prices_range(transaction)
 ```
 
+{{< pagebreak >}}
+
 # What is the impact on sales of promotions, displays, or being featured in the circular?
 
 ```{r}
+#| echo: !expr knitr::is_html_output()
+#| code-fold: true
+
 #' Product overview
 #'
 #' Helper functions to make visualizations
@@ -216,8 +230,6 @@ ts <- transaction |>
     )
 ```
 
-{{< pagebreak >}}
-
 ```{r}
 product_overview(ts, "BAG SNACKS") |> render_plot()
 ```
@@ -275,6 +287,9 @@ base_price represents the baseline price of the final price of the product.
 # What is the impact on units/visits of promotions?
 
 ```{r}
+#| echo: !expr knitr::is_html_output()
+#| code-fold: true
+
 #' Units/Visits promotion
 #'
 #' Helper functions to make visualizations.
@@ -306,8 +321,6 @@ units_visits_prom <- function(ts, selected_cat) {
     )
 }
 ```
-
-{{< pagebreak >}}
 
 ```{r}
 units_visits_prom(ts, "BAG SNACKS") |> render_plot()

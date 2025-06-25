@@ -57,6 +57,8 @@ dh_forecasting <- function(
   message("\nData Processing")
   tsb <- filter_ts(data$transaction) |> tsibble::fill_gaps()
 
+  # tsb <- sample_for_debugging(tsb)
+
   # Training
   message("\nTraining")
   message("\n- ARIMA")
@@ -232,7 +234,7 @@ dh_validation <- function(
   train <- splitted_data$train
   test <- splitted_data$test
 
-  train <- sample_for_debugging(train)
+  # train <- sample_for_debugging(train)
 
   # Validation
   message("\n\nStarting validation")
