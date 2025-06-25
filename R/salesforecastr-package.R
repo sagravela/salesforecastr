@@ -32,6 +32,7 @@
 #' @importFrom feasts STL
 #' @importFrom generics glance
 #' @importFrom generics interpolate
+#' @importFrom GGally ggpairs
 #' @importFrom janitor clean_names
 #' @importFrom measurements conv_unit
 #' @importFrom progressr handler_progress
