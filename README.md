@@ -1,10 +1,11 @@
 # Sales Time Series Analysis and Forecasting with R
 
-Forecasted over 3,500 time series for various products across multiple stores, applying advanced forecasting models such as *ARIMA*, *STL+ETS*, *NNETAR* and *Prophet*. Forecasted data was integrated into an interactive dashboard, enabling real-time visualization and data-driven decision-making for enhanced inventory and sales strategy.
- ![Sales Time Series Dashboard](assets/sales_forecast.gif)
+Forecasted over 3,500 time series for various products across multiple stores, applying advanced forecasting models such as *ARIMA*, *STL+ETS*, *NNETAR* and *Prophet*. Forecasted data was integrated into an interactive dashboard, enabling real-time visualization and data-driven decision-making for enhanced inventory and sales strategy.  
+  
+ ![Sales Time Series Dashboard](assets/salesforecast.gif)
 
 ## Getting Started
-Shiny App Demo can be run without any setup, click on [shinyapp.io](https://sagravela.shinyapps.io/sales-forecast-dashboard/).  
+Shiny App Demo can be run without any setup, click on [shinyapp.io](https://sagravela.shinyapps.io/salesforecastr/).  
 The entire pipeline is available as an R package, `salesforecastr`, which can be used to run the forecasting and validation process easily.
 To run it locally, build with:
 ```{r}

@@ -9,3 +9,4 @@ app/**/*.parquet
 *.rds
 reports/*
 !reports/*.pdf
+/.quarto/
