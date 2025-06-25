@@ -11,10 +11,10 @@ To run it locally, build with:
 devtools::install_github("sagravela/salesforecastr")
 ```
 Then the pipeline can be run with `dh_forecasting()` and `dh_validation()` functions.  
->For more details, check the documentation package:
-```{r}
-help(package = "salesforecastr")
-```
+> For more details, check the documentation package:
+> ```{r}
+> help(package = "salesforecastr")
+> ```
 
 
 ## Dataset Overview: Breakfast at the Frat, a Time Series Analysis
