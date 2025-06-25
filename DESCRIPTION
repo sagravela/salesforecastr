@@ -1,9 +1,9 @@
 Package: salesforecastr
-Title: What the Package Does (One Line, Title Case)
+Title: Sales Forecasting with Time Series Models
 Version: 0.0.0.9000
 Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"))
-Description: What the package does (one paragraph).
+    person("Alejandro", "Vargas", , "alejandrovargasauger@gmail.com", role = c("aut", "cre"))
+Description: A package for sales forecasting using time series models. It provides tools for data preparation, model fitting, and evaluation, with a focus on ease of use and flexibility.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)

@@ -1,6 +1,6 @@
 # Sales Time Series Analysis and Forecasting with R
 
-Forecasted over 3,500 time series for various products across multiple stores, applying advanced forecasting models such as *ARIMA*, *STL+ETS*, *NNETAR* and *Prophet*. Model's prediction error translates in average to ~$15 per week in potential revenue miscalculation. Forecasted data was integrated into an interactive dashboard, enabling real-time visualization and data-driven decision-making for enhanced inventory and sales strategy.
+Forecasted over 3,500 time series for various products across multiple stores, applying advanced forecasting models such as *ARIMA*, *STL+ETS*, *NNETAR* and *Prophet*. Forecasted data was integrated into an interactive dashboard, enabling real-time visualization and data-driven decision-making for enhanced inventory and sales strategy.
  ![Sales Time Series Dashboard](assets/sales_forecast.gif)
 
 ## Getting Started

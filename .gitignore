@@ -6,4 +6,4 @@
 .quarto
 *.xlsx
 app/**/*.parquet
-app/**/*.rds
+*.rds
